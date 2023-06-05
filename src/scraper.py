@@ -1,13 +1,21 @@
 from bs4 import BeautifulSoup
 import requests
 import lxml
+import pandas as pd
+import os
+import json
+import csv
 
 class booking:
     def __init__(self, headers):
         # Constructor for the Booking class
         print('Object booking created')
+        key = ['hotel_name','room_rate','price','location','checkin_date','checkout_date']
         self._url = 'https://www.booking.com/searchresults.it.html'
         self._headers = headers
+        self.data = []
+        
+    
 
     def set(self, destination, checkin, checkout, num_adults, num_children, num_rooms=1,
             sb_travel_purpose='leisure', nflt='privacy_type%3D3', order='review_score_and_price'):
@@ -38,7 +46,6 @@ class booking:
 
     def get_data(self):
         # Get hotel data
-        data = []
         page = 0
 
         while page <= 150:
@@ -78,9 +85,9 @@ class booking:
                 except:
                     location = 'null'
                     print(location)
-
+                
                 print('\n\n-------\n\n')
-                data.append({
+                self.data.append({
                     'hotel_name': hotel,
                     'room_rate': room_rate,
                     'price': price,
@@ -89,6 +96,29 @@ class booking:
                     'checkout_date': self.params['checkout']
                 })
 
+
+                
+
+               
+
             page += 25
 
-        return data
+    def save(self,extension,filename):
+        folder_path = os.path.abspath(os.path.join(os.getcwd()))
+        filepath = os.path.join(folder_path, filename)
+        if extension == '.xlxs':
+            df = pd.DataFrame(self.data)
+            df.to_excel(filepath)
+
+        elif extension == '.json': 
+            with open(filepath, 'w') as file:
+                json.dump(self.data, file)
+
+        elif extension == '.csv':
+            fieldnames = self.data[0].keys()
+            with open(filepath, 'w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(self.data)   
+        else:
+            print('ERROR: extension not supported')
