@@ -58,67 +58,75 @@ class booking:
                 break
 
             for item in lists:
-                try:
-                    hotel = item.find("div", {"class": "fcab3ed991 a23c043802"}).text
-                    print(hotel)
-                except:
-                    hotel = 'null'
-                    print(hotel)
-
-                try:
-                    room_rate = item.find("div", {"class": "b5cd09854e d10a6220b4"}).get_text()
-                    print(room_rate)
-                except:
-                    room_rate = 'null'
-                    print(room_rate)
-
-                try:
-                    price = item.find("span", {"class": "fcab3ed991 fbd1d3018c e729ed5ab6"}).get_text()
-                    print(price)
-                except:
-                    price = 'null'
-                    print('price')
-
+                
                 try:
                     location = item.find('span', {'class': 'f4bd0794db b4273d69aa'}).text
                     print(location)
                 except:
                     location = 'null'
                     print(location)
-                
-                print('\n\n-------\n\n')
-                self.data.append({
-                    'hotel_name': hotel,
-                    'room_rate': room_rate,
-                    'price': price,
-                    'location': location,
-                    'checkin_date': self.params['checkin'],
-                    'checkout_date': self.params['checkout']
-                })
+                if location in [self.destination, 'null']:
+                    try:
+                        hotel = item.find("div", {"class": "fcab3ed991 a23c043802"}).text
+                        print(hotel)
+                    except:
+                        hotel = 'null'
+                        print(hotel)
 
+                    try:
+                        room_rate = item.find("div", {"class": "b5cd09854e d10a6220b4"}).get_text()
+                        print(room_rate)
+                    except:
+                        room_rate = 'null'
+                        print(room_rate)
 
-                
+                    try:
+                        price = item.find("span", {"class": "fcab3ed991 fbd1d3018c e729ed5ab6"}).get_text()
+                        print(price)
+                    except:
+                        price = 'null'
+                        print('price')
 
-               
+                    try:
+                        location = item.find('span', {'class': 'f4bd0794db b4273d69aa'}).text
+                        print(location)
+                    except:
+                        location = 'null'
+                        print(location)
+                    
+                    print('\n\n-------\n\n')
+                    self.data.append({
+                        'hotel_name': hotel,
+                        'room_rate': room_rate,
+                        'price': price,
+                        'location': location,
+                        'checkin_date': self.params['checkin'],
+                        'checkout_date': self.params['checkout']
+                    })
 
             page += 25
 
     def save(self,extension,filename):
-        folder_path = os.path.abspath(os.path.join(os.getcwd()))
+        # Get the absolute path of the 'output' folder
+        folder_path = os.path.abspath(os.path.join(os.getcwd(),'output'))
+        
+        # Combine the folder path with the file name to create the full file path
         filepath = os.path.join(folder_path, filename)
-        if extension == '.xlxs':
+        
+        if extension == '.xlxs':  # If the extension is .xlxs
             df = pd.DataFrame(self.data)
-            df.to_excel(filepath)
+            df.to_excel(filepath) # Save the data to an Excel file
 
-        elif extension == '.json': 
+        elif extension == '.json': # If the extension is .json
             with open(filepath, 'w') as file:
-                json.dump(self.data, file)
+                json.dump(self.data, file) # Save the data to a JSON file
 
-        elif extension == '.csv':
+        elif extension == '.csv': # If the extension is .csv
             fieldnames = self.data[0].keys()
             with open(filepath, 'w', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 writer.writeheader()
-                writer.writerows(self.data)   
-        else:
+                writer.writerows(self.data)  # Save the data to a CSV file 
+        
+        else: # If the extension is not supported
             print('ERROR: extension not supported')
