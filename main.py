@@ -2,12 +2,13 @@ import pandas as pd
 
 from src.scraper import booking
 
-
+# Prompt the user to input their user-agent string
 user_agent = input('hello! insert your user-agent, you can search it typing on google <what is my user agent?>\n')
 
+# Create an instance of the booking object with the provided user-agent
 holidays = booking({'User-Agent':user_agent})
 
-# Set the parameters for the booking search
+# Set the parameters for the booking search using user's inputs
 location = input('insert the location for your holidays\n') 
 checkin_= input('insert the checkin date\n')
 checkout_= input('insert the checkout date\n')
@@ -21,7 +22,7 @@ holidays.init_set()
 
 # Get the hotel data
 holidays.get_data()
-# Create a pandas DataFrame from the retrieved data
 
+# Create a pandas DataFrame from the retrieved data
 df = pd.DataFrame(holidays.data)
 print(df)

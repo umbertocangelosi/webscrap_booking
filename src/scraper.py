@@ -9,14 +9,13 @@ import csv
 class booking:
     def __init__(self, headers):
         # Constructor for the Booking class
-        print('Object booking created')
         key = ['hotel_name','room_rate','price','location','checkin_date','checkout_date']
         self._url = 'https://www.booking.com/searchresults.it.html'
         self._headers = headers
         self.data = []
+        print('Object booking created')
         
     
-
     def set(self, destination, checkin, checkout, num_adults, num_children, num_rooms=1,
             sb_travel_purpose='leisure', nflt='privacy_type%3D3', order='review_score_and_price'):
         # Set the parameters for the search
@@ -29,6 +28,8 @@ class booking:
         self.sb_travel_purpose = sb_travel_purpose
         self.nflt = nflt
         self.order = order
+        print('Parameters setted')
+
 
     def init_set(self):
         # Initialize the parameters for the HTTP request
@@ -43,12 +44,14 @@ class booking:
             'nflt': self.nflt,
             'order': self.order,
         }
+        print('Parameters initialized')
+
 
     def get_data(self):
         # Get hotel data
         page = 0
 
-        while page <= 150:
+        while page <= 200:
             self.params['offset'] = page
             response = requests.get(self._url, params=self.params, headers=self._headers)
             soup = BeautifulSoup(response.content, "lxml")
@@ -61,40 +64,39 @@ class booking:
                 
                 try:
                     location = item.find('span', {'class': 'f4bd0794db b4273d69aa'}).text
-                    print(location)
+                    
                 except:
                     location = 'null'
-                    print(location)
+                    
                 if location in [self.destination, 'null']:
                     try:
                         hotel = item.find("div", {"class": "fcab3ed991 a23c043802"}).text
-                        print(hotel)
+                        
                     except:
                         hotel = 'null'
-                        print(hotel)
+                        
 
                     try:
                         room_rate = item.find("div", {"class": "b5cd09854e d10a6220b4"}).get_text()
-                        print(room_rate)
+                        
                     except:
                         room_rate = 'null'
-                        print(room_rate)
+                        
 
                     try:
                         price = item.find("span", {"class": "fcab3ed991 fbd1d3018c e729ed5ab6"}).get_text()
-                        print(price)
+                        
                     except:
                         price = 'null'
-                        print('price')
+                        
 
                     try:
                         location = item.find('span', {'class': 'f4bd0794db b4273d69aa'}).text
-                        print(location)
+                        
                     except:
                         location = 'null'
-                        print(location)
+                        
                     
-                    print('\n\n-------\n\n')
                     self.data.append({
                         'hotel_name': hotel,
                         'room_rate': room_rate,
@@ -105,6 +107,9 @@ class booking:
                     })
 
             page += 25
+        
+        print('The datas has been collected')    
+
 
     def save(self,extension,filename):
         # Get the absolute path of the 'output' folder
